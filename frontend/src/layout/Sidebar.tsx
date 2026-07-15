@@ -1,23 +1,26 @@
 import { For } from "solid-js";
+import { currentPage, navigate, type PageId } from "../stores/navigation";
 
 interface NavEntry {
   icon: string;
   label: string;
-  /** Phase de la roadmap qui livrera la page (désactivée d'ici là). */
-  phase?: number;
+  /** Page routée ; absent = pas encore livrée. */
+  page?: PageId;
+  /** Issue GitHub qui livrera l'entrée (tooltip des entrées grisées). */
+  issue?: number;
 }
 
 const NAV: NavEntry[] = [
-  { icon: "▦", label: "Dashboard" },
-  { icon: "▣", label: "CPU", phase: 1 },
-  { icon: "◔", label: "GPU", phase: 2 },
-  { icon: "◫", label: "Disques", phase: 1 },
-  { icon: "⇅", label: "Réseau", phase: 1 },
-  { icon: "≡", label: "Processus", phase: 1 },
-  { icon: "◧", label: "Docker", phase: 2 },
-  { icon: "◷", label: "Historique", phase: 3 },
-  { icon: "◎", label: "Alertes", phase: 3 },
-  { icon: "⚙", label: "Paramètres", phase: 1 },
+  { icon: "▦", label: "Dashboard", page: "dashboard" },
+  { icon: "≡", label: "Processus", page: "processes" },
+  { icon: "▣", label: "CPU", issue: 25 },
+  { icon: "◔", label: "GPU", issue: 35 },
+  { icon: "◫", label: "Disques", issue: 37 },
+  { icon: "⇅", label: "Réseau", issue: 42 },
+  { icon: "◧", label: "Docker", issue: 40 },
+  { icon: "◷", label: "Historique", issue: 49 },
+  { icon: "◎", label: "Alertes", issue: 55 },
+  { icon: "⚙", label: "Paramètres", page: "settings" },
 ];
 
 export function Sidebar() {
@@ -31,9 +34,10 @@ export function Sidebar() {
         {(entry) => (
           <button
             class="nav-item"
-            classList={{ active: !entry.phase }}
-            disabled={!!entry.phase}
-            title={entry.phase ? `Arrive en Phase ${entry.phase}` : undefined}
+            classList={{ active: entry.page === currentPage() }}
+            disabled={!entry.page}
+            title={entry.issue ? `Arrive avec l'issue #${entry.issue}` : undefined}
+            onClick={() => entry.page && navigate(entry.page)}
           >
             <span class="nav-icon">{entry.icon}</span>
             {entry.label}

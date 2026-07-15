@@ -1,6 +1,8 @@
-//! Pont bus → webview : chaque batch du bus devient un event IPC
-//! `metrics-batch`. Un event par tick de collecteur, jamais un par
-//! métrique — la frontière webview est le point de contention n°1.
+//! Pont bus → webview. La frontière webview est le point de contention
+//! n°1 : les batches du bus sont coalescés par fenêtres de 100 ms et
+//! émis en un seul event `metrics-batch` (un tableau de batches) —
+//! quatre collecteurs qui tickent à la même seconde = un event, pas
+//! quatre (issue #21).
 
 use std::time::UNIX_EPOCH;
 
@@ -65,23 +67,40 @@ fn to_dto(batch: &Batch) -> Option<BatchDto> {
     })
 }
 
+/// Fenêtre de coalescence : assez courte pour rester imperceptible à
+/// l'œil, assez longue pour regrouper les collecteurs d'un même tick.
+const FLUSH_INTERVAL: std::time::Duration = std::time::Duration::from_millis(100);
+
 pub fn spawn(app: AppHandle, mut rx: broadcast::Receiver<Batch>) {
     tauri::async_runtime::spawn(async move {
+        let mut pending: Vec<BatchDto> = Vec::new();
+        let mut flush = tokio::time::interval(FLUSH_INTERVAL);
+        flush.set_missed_tick_behavior(tokio::time::MissedTickBehavior::Skip);
+
         loop {
-            match rx.recv().await {
-                Ok(batch) => {
-                    if let Some(dto) = to_dto(&batch) {
-                        if let Err(error) = app.emit("metrics-batch", &dto) {
-                            tracing::warn!(%error, "émission IPC échouée");
+            tokio::select! {
+                received = rx.recv() => match received {
+                    Ok(batch) => {
+                        if let Some(dto) = to_dto(&batch) {
+                            pending.push(dto);
                         }
                     }
+                    // Webview plus lente que la collecte : on saute les
+                    // batches perdus, les suivants remettent à jour.
+                    Err(broadcast::error::RecvError::Lagged(missed)) => {
+                        tracing::debug!(missed, "forwarder en retard sur le bus");
+                    }
+                    Err(broadcast::error::RecvError::Closed) => break,
+                },
+                _ = flush.tick() => {
+                    if pending.is_empty() {
+                        continue;
+                    }
+                    if let Err(error) = app.emit("metrics-batch", &pending) {
+                        tracing::warn!(%error, "émission IPC échouée");
+                    }
+                    pending.clear();
                 }
-                // Webview plus lente que la collecte : on saute les batches
-                // perdus, le prochain reçu remet le graphe à jour.
-                Err(broadcast::error::RecvError::Lagged(missed)) => {
-                    tracing::debug!(missed, "forwarder en retard sur le bus");
-                }
-                Err(broadcast::error::RecvError::Closed) => break,
             }
         }
     });

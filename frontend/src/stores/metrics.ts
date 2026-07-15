@@ -82,16 +82,18 @@ export function labelledKeys(
   return out;
 }
 
-function ingest(batch: BatchDto) {
-  const ts = batch.ts_ms / 1000;
-  for (const sample of batch.samples) {
-    if (sample.value.kind === "text") continue;
-    const buf = seriesFor(seriesKey(sample.metric, sample.labels));
-    buf.ts.push(ts);
-    buf.v.push(sample.value.v);
-    if (buf.ts.length > WINDOW_POINTS) {
-      buf.ts.splice(0, buf.ts.length - WINDOW_POINTS);
-      buf.v.splice(0, buf.v.length - WINDOW_POINTS);
+function ingest(batches: BatchDto[]) {
+  for (const batch of batches) {
+    const ts = batch.ts_ms / 1000;
+    for (const sample of batch.samples) {
+      if (sample.value.kind === "text") continue;
+      const buf = seriesFor(seriesKey(sample.metric, sample.labels));
+      buf.ts.push(ts);
+      buf.v.push(sample.value.v);
+      if (buf.ts.length > WINDOW_POINTS) {
+        buf.ts.splice(0, buf.ts.length - WINDOW_POINTS);
+        buf.v.splice(0, buf.v.length - WINDOW_POINTS);
+      }
     }
   }
   setVersion((n) => n + 1);

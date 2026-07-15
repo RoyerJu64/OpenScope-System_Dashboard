@@ -8,10 +8,14 @@ import type {
   ProcessRowDto,
 } from "./types";
 
+/**
+ * Le backend coalesce les ticks par fenêtres de 100 ms : chaque event
+ * porte un tableau de batches (issue #21).
+ */
 export function onMetricsBatch(
-  handler: (batch: BatchDto) => void,
+  handler: (batches: BatchDto[]) => void,
 ): Promise<UnlistenFn> {
-  return listen<BatchDto>("metrics-batch", (event) => handler(event.payload));
+  return listen<BatchDto[]>("metrics-batch", (event) => handler(event.payload));
 }
 
 export function getCapabilities(): Promise<Capabilities> {
