@@ -17,6 +17,7 @@ interface Props {
   unit?: string;
   /** "bytes" : valeurs humanisées en o/s → Gio/s (axe et tooltip). */
   format?: "bytes";
+  /** Hauteur fixe en px ; absente, le graphe remplit son conteneur. */
   height?: number;
   /** Bornes fixes de l'axe Y (ex. 0–100 pour des %). */
   range?: [number, number];
@@ -48,7 +49,7 @@ export function TimeSeries(props: Props) {
   let container!: HTMLDivElement;
   let tooltip!: HTMLDivElement;
   let plot: uPlot | undefined;
-  const height = props.height ?? 200;
+  const currentHeight = () => props.height ?? (container.clientHeight || 200);
 
   const color = (spec: SeriesSpec, index: number) =>
     cssVar(spec.colorToken ?? `--series-${index + 1}`);
@@ -65,7 +66,7 @@ export function TimeSeries(props: Props) {
 
     const opts: uPlot.Options = {
       width: container.clientWidth || 300,
-      height,
+      height: currentHeight(),
       legend: { show: false },
       cursor: { y: false, points: { size: 8 } },
       scales: {
@@ -144,7 +145,10 @@ export function TimeSeries(props: Props) {
 
     const resize = new ResizeObserver(() => {
       if (container.clientWidth > 0) {
-        plot?.setSize({ width: container.clientWidth, height });
+        plot?.setSize({
+          width: container.clientWidth,
+          height: currentHeight(),
+        });
       }
     });
     resize.observe(container);
@@ -165,7 +169,13 @@ export function TimeSeries(props: Props) {
   });
 
   return (
-    <div>
+    <div
+      style={
+        props.height
+          ? undefined
+          : { display: "flex", "flex-direction": "column", height: "100%", "min-height": "0" }
+      }
+    >
       <Show when={props.series.length > 1}>
         <div class="chart-legend">
           <For each={props.series}>
@@ -181,7 +191,11 @@ export function TimeSeries(props: Props) {
           </For>
         </div>
       </Show>
-      <div ref={container} class="chart" style={{ height: `${height}px` }}>
+      <div
+        ref={container}
+        class="chart"
+        style={props.height ? { height: `${props.height}px` } : { flex: "1", "min-height": "0" }}
+      >
         <div ref={tooltip} class="chart-tooltip" />
       </div>
     </div>

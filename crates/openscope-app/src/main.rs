@@ -28,7 +28,9 @@ fn main() {
             commands::list_processes,
             commands::kill_process,
             commands::set_priority,
-            commands::get_hot_window
+            commands::get_hot_window,
+            commands::get_layout,
+            commands::save_layout
         ])
         .setup(|app| {
             let bus = MetricBus::default();

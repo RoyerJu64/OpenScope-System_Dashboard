@@ -7,7 +7,7 @@ use std::time::Duration;
 
 use openscope_core::{ActionOutcome, Capabilities};
 use serde::Serialize;
-use tauri::State;
+use tauri::{Manager, State};
 
 use crate::state::AppState;
 
@@ -99,6 +99,47 @@ pub fn get_hot_window(state: State<'_, AppState>, metrics: Vec<String>) -> Vec<H
             }
         })
         .collect()
+}
+
+fn layout_path(app: &tauri::AppHandle, page: &str) -> Result<std::path::PathBuf, String> {
+    // Nom contraint : identifiant de page, pas un chemin.
+    if page.is_empty() || !page.bytes().all(|b| b.is_ascii_lowercase() || b == b'-') {
+        return Err(format!("nom de page invalide : {page}"));
+    }
+    let dir = app
+        .path()
+        .app_config_dir()
+        .map_err(|e| e.to_string())?
+        .join("layouts");
+    std::fs::create_dir_all(&dir).map_err(|e| e.to_string())?;
+    Ok(dir.join(format!("{page}.json")))
+}
+
+/// Disposition sauvegardée d'une page de widgets (issue #24). Le schéma
+/// appartient au frontend : JSON opaque côté backend, versionné par le
+/// frontend lui-même.
+#[tauri::command]
+pub fn get_layout(
+    app: tauri::AppHandle,
+    page: String,
+) -> Result<Option<serde_json::Value>, String> {
+    let path = layout_path(&app, &page)?;
+    match std::fs::read_to_string(&path) {
+        Ok(raw) => Ok(serde_json::from_str(&raw).ok()),
+        Err(e) if e.kind() == std::io::ErrorKind::NotFound => Ok(None),
+        Err(e) => Err(e.to_string()),
+    }
+}
+
+#[tauri::command]
+pub fn save_layout(
+    app: tauri::AppHandle,
+    page: String,
+    layout: serde_json::Value,
+) -> Result<(), String> {
+    let path = layout_path(&app, &page)?;
+    let raw = serde_json::to_string_pretty(&layout).map_err(|e| e.to_string())?;
+    std::fs::write(&path, raw).map_err(|e| e.to_string())
 }
 
 /// Snapshot complet de la table des processus (pull : appelé par la

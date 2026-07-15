@@ -45,3 +45,12 @@ export function setPriority(
 ): Promise<ActionOutcome> {
   return invoke<ActionOutcome>("set_priority", { pid, nice });
 }
+
+/** Disposition sauvegardée d'une page (schéma possédé par le frontend). */
+export function getLayout(page: string): Promise<unknown | null> {
+  return invoke<unknown | null>("get_layout", { page });
+}
+
+export function saveLayout(page: string, layout: unknown): Promise<void> {
+  return invoke<void>("save_layout", { page, layout });
+}
