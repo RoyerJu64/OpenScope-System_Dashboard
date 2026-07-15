@@ -1,6 +1,16 @@
 import { createSignal } from "solid-js";
-import { onMetricsBatch } from "../ipc/client";
+import { getHotWindow, onMetricsBatch } from "../ipc/client";
 import type { BatchDto } from "../ipc/types";
+
+/** Métriques pré-remplies au démarrage depuis la fenêtre chaude backend. */
+const PREFILL_METRICS = [
+  "cpu.usage",
+  "mem.used_pct",
+  "disk.read_bps",
+  "disk.write_bps",
+  "net.rx_bps",
+  "net.tx_bps",
+];
 
 /**
  * Fenêtre visible côté client. Le backend garde la fenêtre chaude
@@ -89,9 +99,43 @@ function ingest(batch: BatchDto) {
 
 let started = false;
 
-/** Branche le store sur l'event IPC `metrics-batch`. Idempotent. */
+/**
+ * Branche le store sur l'event IPC `metrics-batch`, puis pré-remplit les
+ * graphes avec la fenêtre chaude backend (issue #20) : à la réouverture
+ * de l'app ou d'une page, l'historique récent est déjà là. Idempotent.
+ */
 export async function startMetricsListener(): Promise<void> {
   if (started) return;
   started = true;
   await onMetricsBatch(ingest);
+
+  try {
+    const hot = await getHotWindow(PREFILL_METRICS);
+    for (const s of hot) {
+      const buf = seriesFor(seriesKey(s.metric, s.labels));
+      // On ne préfixe que les points antérieurs au premier point live,
+      // pour ne jamais dupliquer ce que le listener a déjà reçu.
+      const firstLive = buf.ts[0] ?? Infinity;
+      const ts: number[] = [];
+      const v: (number | null)[] = [];
+      for (let i = 0; i < s.ts_ms.length; i += 1) {
+        const t = s.ts_ms[i] / 1000;
+        if (t < firstLive) {
+          ts.push(t);
+          v.push(s.values[i]);
+        }
+      }
+      if (ts.length > 0) {
+        buf.ts.unshift(...ts);
+        buf.v.unshift(...v);
+        if (buf.ts.length > WINDOW_POINTS) {
+          buf.ts.splice(0, buf.ts.length - WINDOW_POINTS);
+          buf.v.splice(0, buf.v.length - WINDOW_POINTS);
+        }
+      }
+    }
+    setVersion((n) => n + 1);
+  } catch {
+    // Fenêtre chaude indisponible : les graphes se remplissent en live.
+  }
 }

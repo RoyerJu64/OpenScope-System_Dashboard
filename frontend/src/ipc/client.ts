@@ -4,6 +4,7 @@ import type {
   ActionOutcome,
   BatchDto,
   Capabilities,
+  HotSeriesDto,
   ProcessRowDto,
 } from "./types";
 
@@ -15,6 +16,11 @@ export function onMetricsBatch(
 
 export function getCapabilities(): Promise<Capabilities> {
   return invoke<Capabilities>("get_capabilities");
+}
+
+/** Fenêtre chaude (~10 min) des métriques demandées, tous labels confondus. */
+export function getHotWindow(metrics: string[]): Promise<HotSeriesDto[]> {
+  return invoke<HotSeriesDto[]>("get_hot_window", { metrics });
 }
 
 export function listProcesses(): Promise<ProcessRowDto[]> {

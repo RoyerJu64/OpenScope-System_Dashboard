@@ -27,7 +27,8 @@ fn main() {
             commands::set_collector_interval,
             commands::list_processes,
             commands::kill_process,
-            commands::set_priority
+            commands::set_priority,
+            commands::get_hot_window
         ])
         .setup(|app| {
             let bus = MetricBus::default();
@@ -35,6 +36,20 @@ fn main() {
             app.manage(state.clone());
 
             forwarder::spawn(app.handle().clone(), bus.subscribe());
+
+            // Fenêtre chaude : consommateur du bus comme un autre.
+            let hot = std::sync::Arc::new(openscope_history::HotWindow::default());
+            state.install_hot(hot.clone());
+            let mut hot_rx = bus.subscribe();
+            tauri::async_runtime::spawn(async move {
+                loop {
+                    match hot_rx.recv().await {
+                        Ok(batch) => hot.append_batch(&batch),
+                        Err(tokio::sync::broadcast::error::RecvError::Lagged(_)) => continue,
+                        Err(tokio::sync::broadcast::error::RecvError::Closed) => break,
+                    }
+                }
+            });
 
             // Démarrage de la collecte locale. Le scheduler vit aussi
             // longtemps que l'app : on le range dans l'état partagé.

@@ -11,3 +11,4 @@ export type { Capabilities } from "./bindings/Capabilities";
 export type { CollectorCapability } from "./bindings/CollectorCapability";
 export type { ProcessRowDto } from "./bindings/ProcessRowDto";
 export type { ActionOutcome } from "./bindings/ActionOutcome";
+export type { HotSeriesDto } from "./bindings/HotSeriesDto";

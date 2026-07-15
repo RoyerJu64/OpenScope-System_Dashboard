@@ -22,6 +22,7 @@ tauri-build = { version = "2", features = [] }
 [dependencies]
 openscope-core = { workspace = true }
 openscope-collect = { workspace = true }
+openscope-history = { workspace = true }
 tauri = { version = "2", features = [] }
 tokio = { workspace = true }
 serde = { workspace = true }

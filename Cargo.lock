@@ -2068,6 +2068,7 @@ dependencies = [
  "libc",
  "openscope-collect",
  "openscope-core",
+ "openscope-history",
  "serde",
  "serde_json",
  "tauri",

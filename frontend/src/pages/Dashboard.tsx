@@ -1,6 +1,7 @@
-import { createMemo } from "solid-js";
+import { createMemo, Show } from "solid-js";
 import { TimeSeries } from "../charts/TimeSeries";
 import { CpuCores } from "../widgets/CpuCores";
+import { isAvailable } from "../stores/capabilities";
 import { labelledKeys, lastValue, version } from "../stores/metrics";
 
 /**
@@ -62,6 +63,7 @@ export function Dashboard() {
     <main class="main">
       <h1 class="page-title">Vue d'ensemble</h1>
       <div class="widget-grid">
+        <Show when={isAvailable("cpu")}>
         <section class="card" style={{ "grid-column": "span 2" }}>
           <h2 class="card-title">CPU — utilisation</h2>
           <TimeSeries
@@ -84,6 +86,8 @@ export function Dashboard() {
           <h2 class="card-title">CPU — cœurs</h2>
           <CpuCores />
         </section>
+        </Show>
+        <Show when={isAvailable("memory")}>
         <section class="card" style={{ "grid-column": "span 2" }}>
           <h2 class="card-title">Mémoire — utilisation</h2>
           <TimeSeries
@@ -106,6 +110,8 @@ export function Dashboard() {
           </div>
           <div class="stat-sub">{memDetails()}</div>
         </section>
+        </Show>
+        <Show when={isAvailable("disk")}>
         <section class="card" style={{ "grid-column": "span 2" }}>
           <h2 class="card-title">Disque — débits</h2>
           <TimeSeries
@@ -117,6 +123,8 @@ export function Dashboard() {
             height={180}
           />
         </section>
+        </Show>
+        <Show when={isAvailable("network")}>
         <section class="card" style={{ "grid-column": "span 2" }}>
           <h2 class="card-title">Réseau — débits</h2>
           <TimeSeries
@@ -128,6 +136,7 @@ export function Dashboard() {
             height={180}
           />
         </section>
+        </Show>
       </div>
     </main>
   );

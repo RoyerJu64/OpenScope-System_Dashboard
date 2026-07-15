@@ -71,6 +71,36 @@ pub fn set_collector_interval(
     }
 }
 
+/// Une série de la fenêtre chaude (points des ~10 dernières minutes).
+#[derive(Serialize, Clone)]
+#[cfg_attr(feature = "ts", derive(ts_rs::TS), ts(export))]
+pub struct HotSeriesDto {
+    pub metric: String,
+    pub labels: BTreeMap<String, String>,
+    #[cfg_attr(feature = "ts", ts(type = "Array<number>"))]
+    pub ts_ms: Vec<u64>,
+    pub values: Vec<f64>,
+}
+
+/// Fenêtre chaude des métriques demandées (tous labels confondus) :
+/// appelée au montage d'une page pour pré-remplir les graphes.
+#[tauri::command]
+pub fn get_hot_window(state: State<'_, AppState>, metrics: Vec<String>) -> Vec<HotSeriesDto> {
+    state
+        .query_hot(&openscope_core::SourceId::local(), &metrics)
+        .into_iter()
+        .map(|s| {
+            let (ts_ms, values) = s.points.into_iter().unzip();
+            HotSeriesDto {
+                metric: s.metric.to_string(),
+                labels: s.labels,
+                ts_ms,
+                values,
+            }
+        })
+        .collect()
+}
+
 /// Snapshot complet de la table des processus (pull : appelé par la
 /// page Processus quand elle est visible). Tri et recherche côté front.
 #[tauri::command]
