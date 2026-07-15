@@ -1,0 +1,44 @@
+/*
+ * Design tokens OpenScope — thème sombre (défaut).
+ * Valeurs issues d'une palette validée (contraste + daltonisme) sur
+ * surface sombre #1a1a19. Le thème clair arrive en Phase 2 (issue #46).
+ */
+:root {
+  color-scheme: dark;
+
+  /* Plans */
+  --page: #0d0d0d;
+  --surface: #1a1a19;
+  --surface-raised: #222221;
+  --border: rgba(255, 255, 255, 0.1);
+
+  /* Encres */
+  --ink: #ffffff;
+  --ink-secondary: #c3c2b7;
+  --ink-muted: #898781;
+
+  /* Chrome des graphes */
+  --gridline: #2c2c2a;
+  --axis: #383835;
+
+  /* Séries (ordre catégoriel fixe, validé CVD sur surface sombre) */
+  --series-1: #3987e5; /* bleu */
+  --series-2: #008300; /* vert */
+  --series-3: #d55181; /* magenta */
+  --series-4: #c98500; /* jaune */
+  --series-5: #199e70; /* aqua */
+  --series-6: #d95926; /* orange */
+  --series-7: #9085e9; /* violet */
+  --series-8: #e66767; /* rouge */
+
+  /* Statuts (réservés aux états, jamais des séries) */
+  --status-good: #0ca30c;
+  --status-warning: #fab219;
+  --status-serious: #ec835a;
+  --status-critical: #d03b3b;
+
+  /* Typo & rythme */
+  --font: system-ui, -apple-system, "Segoe UI", sans-serif;
+  --radius: 10px;
+  --gap: 14px;
+}

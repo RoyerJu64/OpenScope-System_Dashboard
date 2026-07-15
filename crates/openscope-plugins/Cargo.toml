@@ -1,0 +1,11 @@
+[package]
+name = "openscope-plugins"
+description = "Système de plugins WASM (Extism) : collecteurs et widgets tiers sandboxés"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+repository.workspace = true
+authors.workspace = true
+
+[dependencies]
+openscope-core = { workspace = true }

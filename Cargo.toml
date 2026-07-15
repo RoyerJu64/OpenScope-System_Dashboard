@@ -1,0 +1,41 @@
+[workspace]
+resolver = "2"
+members = [
+    "crates/openscope-core",
+    "crates/openscope-collect",
+    "crates/openscope-history",
+    "crates/openscope-alerts",
+    "crates/openscope-remote",
+    "crates/openscope-agent",
+    "crates/openscope-plugins",
+    "crates/openscope-app",
+]
+
+[workspace.package]
+version = "0.1.0"
+edition = "2021"
+license = "MIT OR Apache-2.0"
+repository = "https://github.com/julien-royer/OpenScope"
+authors = ["Julien Royer"]
+
+[workspace.dependencies]
+openscope-core = { path = "crates/openscope-core" }
+openscope-collect = { path = "crates/openscope-collect" }
+openscope-history = { path = "crates/openscope-history" }
+openscope-alerts = { path = "crates/openscope-alerts" }
+openscope-remote = { path = "crates/openscope-remote" }
+openscope-plugins = { path = "crates/openscope-plugins" }
+
+tokio = { version = "1", features = ["rt-multi-thread", "sync", "time", "macros"] }
+async-trait = "0.1"
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+thiserror = "2"
+anyhow = "1"
+tracing = "0.1"
+tracing-subscriber = { version = "0.3", features = ["env-filter"] }
+
+[profile.release]
+lto = "thin"
+codegen-units = 1
+strip = true

@@ -1,0 +1,11 @@
+[package]
+name = "openscope-remote"
+description = "Monitoring distant : connexion SSH, déploiement de l'agent openscoped, sources distantes"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+repository.workspace = true
+authors.workspace = true
+
+[dependencies]
+openscope-core = { workspace = true }

@@ -1,0 +1,16 @@
+[package]
+name = "openscope-agent"
+description = "Agent headless « openscoped » : collecte sur machine distante, JSON-Lines sur stdio"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+repository.workspace = true
+authors.workspace = true
+
+[[bin]]
+name = "openscoped"
+path = "src/main.rs"
+
+[dependencies]
+openscope-core = { workspace = true }
+openscope-collect = { workspace = true }
