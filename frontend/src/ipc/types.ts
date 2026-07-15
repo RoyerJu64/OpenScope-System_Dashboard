@@ -9,3 +9,5 @@ export type { SampleDto } from "./bindings/SampleDto";
 export type { ValueDto } from "./bindings/ValueDto";
 export type { Capabilities } from "./bindings/Capabilities";
 export type { CollectorCapability } from "./bindings/CollectorCapability";
+export type { ProcessRowDto } from "./bindings/ProcessRowDto";
+export type { ActionOutcome } from "./bindings/ActionOutcome";

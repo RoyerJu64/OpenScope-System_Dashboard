@@ -13,6 +13,9 @@ pub struct AppState {
 struct Inner {
     /// Gardé vivant ici ; son Drop arrête les tâches de collecte.
     scheduler: Option<LocalScheduler>,
+    /// Table des processus (état des deltas CPU entre deux pulls).
+    #[cfg(target_os = "linux")]
+    process: openscope_collect::process::ProcessTable,
 }
 
 impl AppState {
@@ -43,6 +46,24 @@ impl AppState {
                     .collect()
             })
             .unwrap_or_default()
+    }
+
+    pub fn process_rows(&self) -> Vec<crate::commands::ProcessRowDto> {
+        #[cfg(target_os = "linux")]
+        {
+            self.inner
+                .lock()
+                .unwrap()
+                .process
+                .snapshot()
+                .into_iter()
+                .map(Into::into)
+                .collect()
+        }
+        #[cfg(not(target_os = "linux"))]
+        {
+            Vec::new() // issues #43/#44 (M2)
+        }
     }
 
     pub fn set_collector_interval(&self, collector: &str, interval: std::time::Duration) -> bool {

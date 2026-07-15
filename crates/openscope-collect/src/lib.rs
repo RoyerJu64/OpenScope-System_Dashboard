@@ -14,6 +14,8 @@ pub mod memory;
 pub mod mock;
 #[cfg(target_os = "linux")]
 pub mod network;
+#[cfg(target_os = "linux")]
+pub mod process;
 pub mod scheduler;
 
 use openscope_core::Collector;

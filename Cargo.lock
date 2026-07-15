@@ -2065,6 +2065,7 @@ name = "openscope-app"
 version = "0.1.0"
 dependencies = [
  "anyhow",
+ "libc",
  "openscope-collect",
  "openscope-core",
  "serde",
@@ -2085,6 +2086,7 @@ dependencies = [
  "async-trait",
  "libc",
  "openscope-core",
+ "serde",
  "tokio",
  "tracing",
 ]
