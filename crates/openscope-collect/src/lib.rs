@@ -8,8 +8,12 @@
 #[cfg(target_os = "linux")]
 pub mod cpu;
 #[cfg(target_os = "linux")]
+pub mod disk;
+#[cfg(target_os = "linux")]
 pub mod memory;
 pub mod mock;
+#[cfg(target_os = "linux")]
+pub mod network;
 pub mod scheduler;
 
 use openscope_core::Collector;
@@ -22,6 +26,8 @@ pub fn default_collectors() -> Vec<Box<dyn Collector>> {
         vec![
             Box::new(cpu::CpuCollector::new()),
             Box::new(memory::MemoryCollector::new()),
+            Box::new(disk::DiskCollector::new()),
+            Box::new(network::NetworkCollector::new()),
         ]
     }
     #[cfg(not(target_os = "linux"))]
