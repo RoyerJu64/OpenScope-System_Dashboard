@@ -5,10 +5,10 @@
 //!
 //! Fréquences, températures et RAPL arrivent avec l'issue #13.
 
-#[cfg(target_os = "linux")]
+// Module entier réservé à Linux (gate dans lib.rs) : le format de
+// /proc/stat n'existe pas ailleurs. Windows/macOS : issues #43/#44.
 mod linux;
 
-#[cfg(target_os = "linux")]
 pub use linux::CpuCollector;
 
 /// Temps cumulés d'un CPU (en ticks USER_HZ), réduits à busy/idle.

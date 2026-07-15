@@ -5,6 +5,7 @@
 //! (memory, disk, network, process…) arrivent avec les issues #13 à #19.
 //! [`mock::MockCollector`] reste disponible pour les tests et le bench.
 
+#[cfg(target_os = "linux")]
 pub mod cpu;
 pub mod mock;
 pub mod scheduler;
