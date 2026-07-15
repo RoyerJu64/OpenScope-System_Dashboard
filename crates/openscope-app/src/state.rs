@@ -29,4 +29,28 @@ impl AppState {
             .map(|s| s.capabilities().clone())
             .unwrap_or_default()
     }
+
+    pub fn collector_intervals(&self) -> std::collections::BTreeMap<String, u64> {
+        self.inner
+            .lock()
+            .unwrap()
+            .scheduler
+            .as_ref()
+            .map(|s| {
+                s.intervals()
+                    .into_iter()
+                    .map(|(id, d)| (id, d.as_millis() as u64))
+                    .collect()
+            })
+            .unwrap_or_default()
+    }
+
+    pub fn set_collector_interval(&self, collector: &str, interval: std::time::Duration) -> bool {
+        self.inner
+            .lock()
+            .unwrap()
+            .scheduler
+            .as_ref()
+            .is_some_and(|s| s.set_interval(collector, interval))
+    }
 }

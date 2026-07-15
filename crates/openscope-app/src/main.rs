@@ -21,7 +21,11 @@ fn main() {
         .init();
 
     tauri::Builder::default()
-        .invoke_handler(tauri::generate_handler![commands::get_capabilities])
+        .invoke_handler(tauri::generate_handler![
+            commands::get_capabilities,
+            commands::get_collector_intervals,
+            commands::set_collector_interval
+        ])
         .setup(|app| {
             let bus = MetricBus::default();
             let state = state::AppState::default();
