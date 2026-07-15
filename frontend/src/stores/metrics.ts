@@ -46,6 +46,32 @@ export function lastValue(key: string): number | null {
   return v ?? null;
 }
 
+/**
+ * Séries d'une métrique déclinée par label — ex. `cpu.usage` par `core`
+ * donne [{label: "0", key: "cpu.usage{core=0}"}, …], triées numériquement.
+ * À lire dans un contexte réactif avec `version()` pour suivre l'arrivée
+ * de nouvelles séries.
+ */
+export function labelledKeys(
+  metric: string,
+  labelKey: string,
+): { label: string; key: string }[] {
+  const prefix = `${metric}{`;
+  const out: { label: string; key: string }[] = [];
+  for (const key of buffers.keys()) {
+    if (!key.startsWith(prefix) || !key.endsWith("}")) continue;
+    const pair = key
+      .slice(prefix.length, -1)
+      .split(",")
+      .find((p) => p.startsWith(`${labelKey}=`));
+    if (pair) out.push({ label: pair.slice(labelKey.length + 1), key });
+  }
+  out.sort(
+    (a, b) => Number(a.label) - Number(b.label) || a.label.localeCompare(b.label),
+  );
+  return out;
+}
+
 function ingest(batch: BatchDto) {
   const ts = batch.ts_ms / 1000;
   for (const sample of batch.samples) {

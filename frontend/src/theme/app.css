@@ -142,6 +142,49 @@ body {
   font-size: 12px;
 }
 
+/* ── Barres par cœur ───────────────────────────────────── */
+.core-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 6px 20px;
+}
+
+.core-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+}
+
+.core-label {
+  width: 20px;
+  text-align: right;
+  color: var(--ink-muted);
+  font-variant-numeric: tabular-nums;
+}
+
+.core-track {
+  flex: 1;
+  height: 8px;
+  border-radius: 4px;
+  background: var(--gridline);
+  overflow: hidden;
+}
+
+.core-fill {
+  height: 100%;
+  border-radius: 4px;
+  background: var(--series-1);
+  transition: width 300ms ease;
+}
+
+.core-value {
+  width: 42px;
+  text-align: right;
+  color: var(--ink-secondary);
+  font-variant-numeric: tabular-nums;
+}
+
 /* ── Graphes (uPlot) ───────────────────────────────────── */
 .chart {
   position: relative;

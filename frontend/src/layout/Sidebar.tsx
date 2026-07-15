@@ -40,7 +40,7 @@ export function Sidebar() {
           </button>
         )}
       </For>
-      <div class="sidebar-footer">v0.1.0-dev · Phase 0</div>
+      <div class="sidebar-footer">v0.1.0-dev · Phase 1</div>
     </nav>
   );
 }
