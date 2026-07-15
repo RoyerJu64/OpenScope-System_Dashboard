@@ -1,13 +1,18 @@
-//! Collecteur CPU (issue #12) : usage global + par cœur.
+//! Collecteur CPU (issues #12 et #13).
 //!
-//! Métriques émises :
+//! Métriques émises (chacune absente si la source n'existe pas — VM sans
+//! cpufreq, RAPL non lisible, pas de capteur hwmon) :
 //! - `cpu.usage` (gauge %) — global sans label, par cœur avec `{"core": "N"}`
-//!
-//! Fréquences, températures et RAPL arrivent avec l'issue #13.
+//! - `cpu.freq_mhz` (gauge) — par cœur, `{"core": "N"}`
+//! - `cpu.temp_c` (gauge °C) — package sans label, sondes avec `{"sensor": …}`
+//! - `cpu.power_w` (gauge W) — RAPL, somme des packages
 
 // Module entier réservé à Linux (gate dans lib.rs) : le format de
 // /proc/stat n'existe pas ailleurs. Windows/macOS : issues #43/#44.
+mod freq;
 mod linux;
+mod rapl;
+mod temp;
 
 pub use linux::CpuCollector;
 
