@@ -41,6 +41,25 @@ jobs:
       - name: Tests
         run: cargo test --workspace
 
+      - name: Bench budget CPU (issue #10)
+        if: runner.os == 'Linux'
+        run: cargo test -p openscope-collect --test perf -- --ignored --nocapture
+
+      - name: Types TS à jour (issue #6)
+        if: runner.os == 'Linux'
+        run: |
+          cargo xtask gen-types
+          git diff --exit-code frontend/src/ipc/bindings
+
+  deny:
+    name: cargo-deny
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: EmbarkStudios/cargo-deny-action@v2
+        with:
+          command: check
+
   frontend:
     name: Frontend
     runs-on: ubuntu-latest

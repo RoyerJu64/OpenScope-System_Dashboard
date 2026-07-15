@@ -1,6 +1,7 @@
 [package]
 name = "openscope-plugins"
 description = "Système de plugins WASM (Extism) : collecteurs et widgets tiers sandboxés"
+publish.workspace = true
 version.workspace = true
 edition.workspace = true
 license.workspace = true

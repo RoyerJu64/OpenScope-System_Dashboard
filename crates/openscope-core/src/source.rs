@@ -35,18 +35,22 @@ impl fmt::Display for SourceId {
 /// Ce qu'une source sait fournir, par collecteur, établi au `probe()`.
 /// L'UI s'en sert pour n'afficher que les widgets pertinents.
 #[derive(Debug, Clone, Default, PartialEq, Serialize, Deserialize)]
+#[cfg_attr(feature = "ts", derive(ts_rs::TS), ts(export))]
 pub struct Capabilities {
     /// collecteur → détail (ex. "cpu" → {available: true, details: {"cores": "16", "rapl": "true"}})
     pub collectors: BTreeMap<String, CollectorCapability>,
 }
 
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
+#[cfg_attr(feature = "ts", derive(ts_rs::TS), ts(export))]
 pub struct CollectorCapability {
     pub available: bool,
-    /// Raison si indisponible (affichable en tooltip), détails si disponible.
+    /// Raison si indisponible (affichable en tooltip).
     #[serde(default, skip_serializing_if = "Option::is_none")]
+    #[cfg_attr(feature = "ts", ts(optional))]
     pub reason: Option<String>,
-    #[serde(default, skip_serializing_if = "BTreeMap::is_empty")]
+    /// Détails si disponible (nb de cœurs, RAPL présent…).
+    #[serde(default)]
     pub details: BTreeMap<String, String>,
 }
 

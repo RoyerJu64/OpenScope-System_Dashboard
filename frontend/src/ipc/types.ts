@@ -1,32 +1,11 @@
 /*
- * DTOs de la frontière IPC. Écrits à la main en Phase 0 ;
- * seront générés depuis les types Rust via ts-rs (issue #6).
+ * Types de la frontière IPC — générés depuis les structs Rust par
+ * `cargo xtask gen-types` (ts-rs). Ne jamais éditer `bindings/` à la
+ * main : la source de vérité est côté Rust.
  */
 
-export type ValueDto =
-  | { kind: "gauge"; v: number }
-  | { kind: "counter"; v: number }
-  | { kind: "text"; v: string };
-
-export interface SampleDto {
-  metric: string;
-  value: ValueDto;
-  labels?: Record<string, string>;
-}
-
-/** Payload de l'event `metrics-batch` : un tick d'un collecteur. */
-export interface BatchDto {
-  source: string;
-  ts_ms: number;
-  samples: SampleDto[];
-}
-
-export interface CollectorCapabilityDto {
-  available: boolean;
-  reason?: string;
-  details?: Record<string, string>;
-}
-
-export interface CapabilitiesDto {
-  collectors: Record<string, CollectorCapabilityDto>;
-}
+export type { BatchDto } from "./bindings/BatchDto";
+export type { SampleDto } from "./bindings/SampleDto";
+export type { ValueDto } from "./bindings/ValueDto";
+export type { Capabilities } from "./bindings/Capabilities";
+export type { CollectorCapability } from "./bindings/CollectorCapability";

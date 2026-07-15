@@ -9,29 +9,32 @@ use serde::Serialize;
 use tauri::{AppHandle, Emitter};
 use tokio::sync::broadcast;
 
-/// DTO de l'event `metrics-batch`. Sera généré vers TypeScript via ts-rs
-/// (issue #6) ; en attendant, le miroir manuel vit dans
-/// `frontend/src/ipc/types.ts`.
+/// DTO de l'event `metrics-batch`. La définition TypeScript est générée
+/// par `cargo xtask gen-types` vers `frontend/src/ipc/bindings/`.
 #[derive(Serialize, Clone)]
-struct BatchDto {
+#[cfg_attr(feature = "ts", derive(ts_rs::TS), ts(export))]
+pub struct BatchDto {
     source: String,
+    /// Millisecondes epoch (u64 côté Rust, number côté JSON/TS).
+    #[cfg_attr(feature = "ts", ts(type = "number"))]
     ts_ms: u64,
     samples: Vec<SampleDto>,
 }
 
 #[derive(Serialize, Clone)]
-struct SampleDto {
+#[cfg_attr(feature = "ts", derive(ts_rs::TS), ts(export))]
+pub struct SampleDto {
     metric: String,
     value: ValueDto,
-    #[serde(skip_serializing_if = "Labels::is_empty")]
     labels: Labels,
 }
 
 #[derive(Serialize, Clone)]
 #[serde(tag = "kind", content = "v", rename_all = "snake_case")]
-enum ValueDto {
+#[cfg_attr(feature = "ts", derive(ts_rs::TS), ts(export))]
+pub enum ValueDto {
     Gauge(f64),
-    Counter(u64),
+    Counter(#[cfg_attr(feature = "ts", ts(type = "number"))] u64),
     Text(String),
 }
 

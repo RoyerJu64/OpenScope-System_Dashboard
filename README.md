@@ -61,6 +61,15 @@ cargo run -p openscope-app       # terminal 2
 cargo test --workspace
 cargo clippy --workspace --all-targets -- -D warnings
 npm --prefix frontend run check
+
+# régénérer les types TypeScript après modification d'un DTO Rust
+cargo xtask gen-types
+
+# politique de dépendances (licences, advisories)
+cargo deny check
+
+# bench budget CPU
+cargo test -p openscope-collect --test perf -- --ignored --nocapture
 ```
 
 ## Licence

@@ -1,11 +1,17 @@
 [package]
 name = "openscope-core"
 description = "Types, traits et bus de métriques partagés par tous les modules OpenScope"
+publish.workspace = true
 version.workspace = true
 edition.workspace = true
 license.workspace = true
 repository.workspace = true
 authors.workspace = true
+
+[features]
+# Génération des définitions TypeScript des types traversant l'IPC
+# (via `cargo xtask gen-types`).
+ts = ["dep:ts-rs"]
 
 [dependencies]
 tokio = { workspace = true }
@@ -13,3 +19,4 @@ async-trait = { workspace = true }
 serde = { workspace = true }
 thiserror = { workspace = true }
 anyhow = { workspace = true }
+ts-rs = { workspace = true, optional = true }
