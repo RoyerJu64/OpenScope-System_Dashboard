@@ -104,7 +104,12 @@ impl LocalScheduler {
     pub fn intervals(&self) -> BTreeMap<String, Duration> {
         self.intervals
             .iter()
-            .map(|(id, ms)| (id.clone(), Duration::from_millis(ms.load(Ordering::Relaxed))))
+            .map(|(id, ms)| {
+                (
+                    id.clone(),
+                    Duration::from_millis(ms.load(Ordering::Relaxed)),
+                )
+            })
             .collect()
     }
 
@@ -233,12 +238,9 @@ mod tests {
     #[tokio::test]
     async fn intervals_are_clamped() {
         let bus = MetricBus::default();
-        let scheduler = LocalScheduler::start(
-            SourceId::local(),
-            bus,
-            vec![Box::new(MockCollector::new())],
-        )
-        .await;
+        let scheduler =
+            LocalScheduler::start(SourceId::local(), bus, vec![Box::new(MockCollector::new())])
+                .await;
 
         assert!(scheduler.set_interval("mock", Duration::from_millis(1)));
         assert_eq!(scheduler.intervals()["mock"], MIN_INTERVAL);

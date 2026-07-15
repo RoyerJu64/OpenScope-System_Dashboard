@@ -26,7 +26,9 @@ impl RaplReader {
             let is_package = name
                 .to_str()
                 .and_then(|n| n.strip_prefix("intel-rapl:"))
-                .is_some_and(|suffix| !suffix.is_empty() && suffix.bytes().all(|b| b.is_ascii_digit()));
+                .is_some_and(|suffix| {
+                    !suffix.is_empty() && suffix.bytes().all(|b| b.is_ascii_digit())
+                });
             if !is_package {
                 continue;
             }
@@ -91,7 +93,10 @@ mod tests {
         fs::write(pkg.join("energy_uj"), "2000000").unwrap(); // +1 J
         let watts = reader.read_watts().expect("delta attendu");
         // 1 J sur ~50 ms → ~20 W ; bornes larges pour absorber le jitter.
-        assert!((1.0..=100.0).contains(&watts), "watts hors bornes : {watts}");
+        assert!(
+            (1.0..=100.0).contains(&watts),
+            "watts hors bornes : {watts}"
+        );
     }
 
     #[test]

@@ -37,6 +37,26 @@ export function Dashboard() {
     return parts.join(" · ");
   });
 
+  const gib = (v: number | null) =>
+    v == null ? "—" : `${(v / 2 ** 30).toFixed(1)} Gio`;
+
+  const memNow = createMemo(() => {
+    version();
+    return lastValue("mem.used_pct");
+  });
+
+  const memDetails = createMemo(() => {
+    version();
+    const used = lastValue("mem.used_bytes");
+    const total = lastValue("mem.total_bytes");
+    const cached = lastValue("mem.cached_bytes");
+    const swapUsed = lastValue("swap.used_bytes");
+    const parts = [`${gib(used)} / ${gib(total)}`];
+    if (cached != null) parts.push(`cache ${gib(cached)}`);
+    if (swapUsed != null) parts.push(`swap ${gib(swapUsed)}`);
+    return parts.join(" · ");
+  });
+
   return (
     <main class="main">
       <h1 class="page-title">Vue d'ensemble</h1>
@@ -62,6 +82,24 @@ export function Dashboard() {
         <section class="card" style={{ "grid-column": "span 2" }}>
           <h2 class="card-title">CPU — cœurs</h2>
           <CpuCores />
+        </section>
+        <section class="card" style={{ "grid-column": "span 2" }}>
+          <h2 class="card-title">Mémoire — utilisation</h2>
+          <TimeSeries
+            seriesKey="mem.used_pct"
+            label="Mémoire"
+            colorToken="--series-5"
+            unit="%"
+            range={[0, 100]}
+            height={180}
+          />
+        </section>
+        <section class="card">
+          <h2 class="card-title">Mémoire — instantané</h2>
+          <div class="stat-value">
+            {memNow() == null ? "—" : `${memNow()!.toFixed(1)} %`}
+          </div>
+          <div class="stat-sub">{memDetails()}</div>
         </section>
       </div>
     </main>

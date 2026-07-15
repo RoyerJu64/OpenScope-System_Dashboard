@@ -107,7 +107,8 @@ impl Collector for CpuCollector {
         if let Some(freq) = &self.freq {
             for (core, mhz) in freq.read_all() {
                 samples.push(
-                    Sample::gauge(&source, "cpu.freq_mhz", mhz).with_label("core", core.to_string()),
+                    Sample::gauge(&source, "cpu.freq_mhz", mhz)
+                        .with_label("core", core.to_string()),
                 );
             }
         }
