@@ -4,8 +4,9 @@ import { CpuCores } from "../widgets/CpuCores";
 import { labelledKeys, lastValue, version } from "../stores/metrics";
 
 /**
- * Dashboard — widgets CPU (issue #12). La grille drag & drop et les
- * widgets mémoire/disque/réseau arrivent avec les issues #14–#26.
+ * Dashboard — widgets CPU, mémoire, disque, réseau (issues #12–#16).
+ * La grille drag & drop arrive avec l'issue #23, les pages dédiées
+ * avec les issues #22 et suivantes.
  */
 export function Dashboard() {
   const cpuNow = createMemo(() => {
@@ -64,9 +65,9 @@ export function Dashboard() {
         <section class="card" style={{ "grid-column": "span 2" }}>
           <h2 class="card-title">CPU — utilisation</h2>
           <TimeSeries
-            seriesKey="cpu.usage"
-            label="CPU"
-            colorToken="--series-1"
+            series={[
+              { seriesKey: "cpu.usage", label: "CPU", colorToken: "--series-1" },
+            ]}
             unit="%"
             range={[0, 100]}
             height={220}
@@ -86,9 +87,13 @@ export function Dashboard() {
         <section class="card" style={{ "grid-column": "span 2" }}>
           <h2 class="card-title">Mémoire — utilisation</h2>
           <TimeSeries
-            seriesKey="mem.used_pct"
-            label="Mémoire"
-            colorToken="--series-5"
+            series={[
+              {
+                seriesKey: "mem.used_pct",
+                label: "Mémoire",
+                colorToken: "--series-5",
+              },
+            ]}
             unit="%"
             range={[0, 100]}
             height={180}
@@ -100,6 +105,28 @@ export function Dashboard() {
             {memNow() == null ? "—" : `${memNow()!.toFixed(1)} %`}
           </div>
           <div class="stat-sub">{memDetails()}</div>
+        </section>
+        <section class="card" style={{ "grid-column": "span 2" }}>
+          <h2 class="card-title">Disque — débits</h2>
+          <TimeSeries
+            series={[
+              { seriesKey: "disk.read_bps", label: "Lecture" },
+              { seriesKey: "disk.write_bps", label: "Écriture" },
+            ]}
+            format="bytes"
+            height={180}
+          />
+        </section>
+        <section class="card" style={{ "grid-column": "span 2" }}>
+          <h2 class="card-title">Réseau — débits</h2>
+          <TimeSeries
+            series={[
+              { seriesKey: "net.rx_bps", label: "Réception" },
+              { seriesKey: "net.tx_bps", label: "Émission" },
+            ]}
+            format="bytes"
+            height={180}
+          />
         </section>
       </div>
     </main>
