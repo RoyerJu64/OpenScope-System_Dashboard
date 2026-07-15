@@ -18,7 +18,7 @@ publish = false
 version = "0.1.0"
 edition = "2021"
 license = "MIT OR Apache-2.0"
-repository = "https://github.com/julien-royer/OpenScope"
+repository = "https://github.com/RoyerJu64/OpenScope-System_Dashboard"
 authors = ["Julien Royer"]
 
 [workspace.dependencies]
